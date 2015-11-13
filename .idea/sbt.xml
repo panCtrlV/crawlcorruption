@@ -19,5 +19,6 @@
         <option name="useOurOwnAutoImport" value="true" />
       </SbtProjectSettings>
     </option>
+    <option name="maximumHeapSize" value="1024" />
   </component>
 </project>

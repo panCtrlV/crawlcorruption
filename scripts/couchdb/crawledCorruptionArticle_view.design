@@ -1,0 +1,11 @@
+{
+    "language": "javascript",
+    "views": {
+        "time-title": {
+            "map": "function(doc) {emit(doc.doc.time, doc.doc.title)}"
+        }
+    },
+    "shows": {
+        "title": "function(doc, req) {return '<h1>' + doc.doc.title + '</h1>'}"
+    }
+}
