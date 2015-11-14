@@ -11,6 +11,11 @@ import org.apache.spark.SparkContext
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.jsoup.{Jsoup, Connection}
+import java.util.UUID
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 
 import com.impanchao.crawlcorruption._
 
@@ -33,15 +38,12 @@ import com.impanchao.crawlcorruption._
 //// TODO: FAILED to launch Spark while using YARN as the cluster manager
 ////////////////////////////////////////////////////////////////////////////////////////
 
-val conf = new SparkConf().setAppName("Crawl FBI Articles").setMaster("local[2]")
+val conf = new SparkConf().setAppName("Crawl FBI Articles").setMaster("local[4]")
 val sc = new SparkContext(conf)
 
 /*
 Crawl articles and save on HDFS
  */
-
-val userAgentString: String = "Mozilla/5.0 (X11; Linux x86_64) " + "AppleWebKit/535.21 (KHTML, like Gecko) " + "Chrome/45.0.2454.101 Safari/535.21"
-//var counter: Int = 0  // track crawled articles
 // Use Spark accumulator as a counter
 val counter = sc.accumulator(0, "Crawled Article Counter")
 
@@ -61,47 +63,57 @@ def getLinksFromOnePage(index: Int) = {
 
 // Get all article links
 val pageIndexRDD =  sc.parallelize(pageIndexArray)
-//pageIndexRDD.take(10)
 val articleLinksRDD = pageIndexRDD.flatMap(ind => getLinksFromOnePage(ind)).persist()
-//val articleLinks = articleLinksRDD.collect()
-//articleLinksRDD.take(1)(0)
 
-//articleLinksRDD.take(20).foreach(println)  // order preserved
-
-// Crawl all article links
+// HDFS URI and target folder
 val uri = "hdfs://127.0.0.1:9000"
 val dir = "/stat598bigdata/fbi-public-corruption-articles/"
 
 // Crawll all articles and save on HDFS
 val processorsRDD =
 articleLinksRDD.
-  flatMap(link =>{
+  map(link =>{
     try {
       Some(CrawledDocumentProcessor(link))
     } catch {
       case e: Exception => println("Error in creating CrawledDocumentProcessor " + e)
       None
     }
-  }).collect()
+  }).
+  map(_.get)
 
-processorsRDD.take(1)
+processorsRDD.
+  foreach(processor => {
+    counter += 1
+    val filename = "article-" + UUID.randomUUID() + ".json"
+    println(counter + ": " + filename + ": " + processor.url)
+    try {
+      processor.saveOnHDFS(uri, dir, filename)
+    } catch {
+      case e: Exception => println("Error writing to HDFS " + e); None
+    }
+  })
 
-//processorsRDD.
-//  foreach(processor => {
-//    counter += 1
-//    val filename = Array("article", counter.value).mkString("-") + ".json"
-//    println(filename + ": " + processor.url)
-//    processor.saveOnHDFS(uri, dir, filename)
-//    println("Done")
-//  })
+// Read from HDFS
+val allFbiArticlesTextFilesRDD = sc.wholeTextFiles(uri+dir)
+//allFbiArticles.collect().length
+//allFbiArticles.take(10).foreach(println)
 
+// Create mapper
+val mapper = new ObjectMapper() with ScalaObjectMapper
+mapper.registerModule(DefaultScalaModule)
 
+// Deserialize JSON string to CrawledCorruptionArticle objects
+val allFbiArticlesObjectsRDD = allFbiArticlesTextFilesRDD.
+  flatMap(t => {
+    try {
+      Some(mapper.readValue(t._2, classOf[CrawledCorruptionArticle]))
+    } catch {
+      case e: Exception => println("Error in deserialization " + e); None
+    }
+  }).persist
 
-//var link = "https://www.fbi.gov/sanantonio/press-releases/2015/two-donna-school-board-members-indicted-on-bribery-and-attempted-extortion-charges"
-//var processor = CrawledDocumentProcessor(link)
-//processor.url
-
-
+allFbiArticlesObjectsRDD.foreach(x => println(x.getFetchTime))
 
 
 

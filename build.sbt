@@ -1,6 +1,8 @@
 name := "crawlcorruption"
 
-version := "1.0"
+version := "0.0"
+
+organization := "com.impanchao"
 
 scalaVersion := "2.11.7"
 
@@ -12,12 +14,12 @@ resolvers ++= Seq(
 //  "Local couchdb-scala repo" at (baseDirectory.value / "lib/couchdb-scala").toURI.toString
 )
 
-
 libraryDependencies ++= Seq(
   "org.jsoup" % "jsoup" % "1.8.3",
   "commons-codec" % "commons-codec" % "1.9",
   "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.6.3",
-  "com.couchbase.client" %% "spark-connector" % "1.0.0",
+//  "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.4.4",
+//  "com.couchbase.client" %% "spark-connector" % "1.0.0",
 //  "com.databricks" % "spark-csv_2.10" % "1.2.0",
 //  "org.scalanlp" %% "breeze" % "0.11.2",
 //  "org.scalanlp" %% "breeze-natives" % "0.11.2",
@@ -42,11 +44,11 @@ libraryDependencies ++= Seq(
   "edu.stanford.nlp" % "stanford-parser" % "3.5.2"
 )
 
-libraryDependencies ++= Seq(
-  "org.springframework" % "spring-context" % "4.2.2.RELEASE",
-  "org.springframework.boot" % "spring-boot-starter-parent" % "1.2.7.RELEASE",
-  "org.springframework.boot" % "spring-boot-starter-web" % "1.2.7.RELEASE"
-)
+//libraryDependencies ++= Seq(
+//  "org.springframework" % "spring-context" % "4.2.2.RELEASE",
+//  "org.springframework.boot" % "spring-boot-starter-parent" % "1.2.7.RELEASE",
+//  "org.springframework.boot" % "spring-boot-starter-web" % "1.2.7.RELEASE"
+//)
 
 //libraryDependencies += "org.apache.tika" % "tika" % "1.11"  // downloaeded in .ivy2 but failed to add
 //libraryDependencies += "org.apache.tika" % "tika-core" % "1.10"  // but tika-core is added successfully
