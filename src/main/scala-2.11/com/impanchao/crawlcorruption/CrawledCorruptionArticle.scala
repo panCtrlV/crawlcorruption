@@ -1,7 +1,8 @@
 package com.impanchao.crawlcorruption
 
 
-case class CrawledCorruptionArticle(fetchTime: String,
+case class CrawledCorruptionArticle(url: String,
+                                    fetchTime: String,
                                     time: String,
                                     title: String,
                                     content: String,
@@ -14,6 +15,7 @@ case class CrawledCorruptionArticle(fetchTime: String,
   Details can be found at:
     http://stackoverflow.com/questions/8038718/serializing-generic-java-object-to-json-using-jackson
    */
+  def getUrl = url
   def getFetchTime = fetchTime
   def getTime = time
   def getTitle = title

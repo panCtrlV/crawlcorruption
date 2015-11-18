@@ -125,6 +125,8 @@ val crawledCorruptionArticlesRDD =
 //////////////////////////////
 val articleContentsRDD = crawledCorruptionArticlesRDD.map(doc => doc.content).persist()
 // Build a classifier
+// One can use either a 3, 4 or 7-class classifier. The details can be found at:
+//  http://nlp.stanford.edu/software/CRF-NER.shtml
 val serializedClassifier = "resources/StanfordNERclassifiers/english.all.3class.distsim.crf.ser.gz"
 val classifier = CRFClassifier.getClassifier(serializedClassifier)
 

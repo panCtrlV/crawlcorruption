@@ -1,3 +1,24 @@
+import AssemblyKeys._
+
+assemblySettings  // enable `sbt assembly` with default settings to create an uber jar
+
+/*
+For more details about using sbt-assembly plugin, please refere to
+  1. http://xerial.org/blog/2014/03/24/sbt/
+  2. http://stackoverflow.com/questions/8470889/installing-sbt-assembly-with-sbt-0-11-2
+  3. https://github.com/sbt/sbt-assembly
+
+Then, you can use `spark-submit` to execute the .jar file. On Hathi, Before to submit a
+Spark application to a YARN cluster, export environment variables:
+
+  $ source /etc/default/hadoop
+
+To submit a Spark application to a YARN cluster:
+
+  $ cd /apps/hathi/spark
+  $ ./bin/spark-submit --master yarn-cluster examples/src/main/python/pi.py 1000
+*/
+
 name := "crawlcorruption"
 
 version := "0.0"
@@ -17,8 +38,8 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "org.jsoup" % "jsoup" % "1.8.3",
   "commons-codec" % "commons-codec" % "1.9",
-  "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.6.3",
-//  "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.4.4",
+//  "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.6.3",
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.4.4",
 //  "com.couchbase.client" %% "spark-connector" % "1.0.0",
 //  "com.databricks" % "spark-csv_2.10" % "1.2.0",
 //  "org.scalanlp" %% "breeze" % "0.11.2",
@@ -30,7 +51,7 @@ libraryDependencies ++= Seq(
 
 // Spark-related libraries
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-yarn" % "1.5.2"
+  "org.apache.spark" %% "spark-yarn" % "1.5.2" % "provided"
 //  "org.apache.spark" %% "spark-core" % "1.5.2",
 //  "org.apache.spark" %% "spark-streaming" % "1.5.2",
 //  "org.apache.spark" %% "spark-mllib" % "1.5.2",
@@ -44,11 +65,8 @@ libraryDependencies ++= Seq(
   "edu.stanford.nlp" % "stanford-parser" % "3.5.2"
 )
 
-//libraryDependencies ++= Seq(
-//  "org.springframework" % "spring-context" % "4.2.2.RELEASE",
-//  "org.springframework.boot" % "spring-boot-starter-parent" % "1.2.7.RELEASE",
-//  "org.springframework.boot" % "spring-boot-starter-web" % "1.2.7.RELEASE"
-//)
-
 //libraryDependencies += "org.apache.tika" % "tika" % "1.11"  // downloaeded in .ivy2 but failed to add
 //libraryDependencies += "org.apache.tika" % "tika-core" % "1.10"  // but tika-core is added successfully
+
+
+mainClass in assembly := Some("CrawlSaveAndReadArticlesOnHdfsWithSparkExample")  // to set an explicit main class
